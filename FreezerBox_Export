@@ -1,0 +1,251 @@
+my_widget_script =
+{
+  init:function (mode, json_data) {
+    //this method is called when the form is being constructed
+    // parameters
+    // mode = if it equals 'view' than it should not be editable
+    //        if it equals 'edit' then it will be used for entry
+    //        if it equals 'view_dev' same as view,  does some additional checks that may slow things down in production
+    //        if it equals 'edit_dev' same as edit,   does some additional checks that may slow things down in production
+
+    // json_data will contain the data to populate the form with, it will be in the form of the data
+    // returned from a call to to_json or empty if this is a new form.
+    //By default it calls the parent_class's init.
+
+    //TO DO write code specific to your form
+    this.parent_class.init(mode, json_data);
+    
+    
+    // Creating the the button
+	var button1 = document.createElement("button");
+	button1.innerHTML = "Export to CSV";
+    button1.style.backgroundColor = "orange";
+
+
+	//Appending the button in the body
+	var buttonPosition = document.getElementsByTagName("body")[0];
+	buttonPosition.appendChild(button1);
+    
+    var testdata = "[{\"name\":\"freezerbox_info_name_mandatory\",\"value\":\"Test\"},{\"name\":\"freezerbox_info_size\",\"value\":\"9x9\"},{\"name\":\"freezerbox_info_custom_row_number\",\"value\":\"9\"},{\"name\":\"freezerbox_info_custom_col_number\",\"value\":\"9\"},{\"name\":\"freezerbox_info_color\",\"value\":\"(None)\"},{\"name\":\"freezerbox_info_loc\",\"value\":\"shelf1_rack1\"},{\"name\":\"freezerbox_info_desc\",\"value\":\"\"},{\"name\":\"freezerbox_info_row_labels\",\"value\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]},{\"name\":\"freezerbox_info_col_labels\",\"value\":[\"A\",\"B\",\"C\",\"D\",\"E\",\"F\",\"G\",\"H\",\"I\",\"J\",\"K\",\"L\",\"M\",\"N\",\"O\",\"P\",\"Q\",\"R\",\"S\",\"T\",\"U\",\"V\",\"W\",\"X\",\"Y\",\"Z\"]},{\"name\":\"cell_data\",\"value\":{\"A1\":[{\"name\":\"name_mandatory\",\"value\":\"Bacteria˚\"},{\"name\":\"sample_type\",\"value\":\"Cell Line\"},{\"name\":\"color_color\",\"value\":\"light blue\"},{\"name\":\"id\",\"value\":\"123\"},{\"name\":\"create_date\",\"value\":\"04/05/2017\"},{\"name\":\"created_by\",\"value\":\"Eileen\"},{\"name\":\"concentration_number\",\"value\":\"90\"},{\"name\":\"desc\",\"value\":\"fla;fkj sljf l;asdjf asdf s\"}],\"B1\":[{\"name\":\"name_mandatory\",\"value\":\"Fungi\"},{\"name\":\"sample_type\",\"value\":\"Yeast\"},{\"name\":\"color_color\",\"value\":\"black\"},{\"name\":\"id\",\"value\":\"566454790173925\"},{\"name\":\"create_date\",\"value\":\"05/05/2017\"},{\"name\":\"created_by\",\"value\":\"Eileen\"},{\"name\":\"concentration_number\",\"value\":\"99\"},{\"name\":\"desc\",\"value\":\"this is a test\"}]}}]"
+
+    var data = json_data;
+    var Report_Location = "";
+    
+    /*var text1= document.createElement("text");
+    text1.innerHTML = data;
+    var textPosition = document.getElementsByTagName("body")[0];
+    textPosition.appendChild(text1);*/
+   	
+       
+    button1.addEventListener("click",function(){
+      	        
+        if(data == '')
+            return null;
+      else {  
+        Report_Location=my_widget_script.ExtractLocation(data);
+        my_widget_script.JSONToCSVConvertor(data, Report_Location, true);}
+    }); 
+
+      
+  },
+
+  to_json:function () {
+    //should return a json string containing the data entered into the form by the user
+    //whatever is return from the method is persisted in LabArchives.  must not be binary data.
+    //called when the user hits the save button, when adding or editing an entry
+    //TO DO write code specific to your form
+    return this.parent_class.to_json();
+  },
+
+  from_json:function (json_data) {
+    //populates the form with json_data
+    //TO DO write code specific to your form
+    this.parent_class.from_json(json_data);
+  },
+
+  test_data:function () {
+    //during development this method is called to populate your form while in preview mode
+    //TO DO write code specific to your form
+    return this.parent_class.test_data();
+  },
+
+  is_valid:function (b_suppress_message) {
+    //called when the user hits the save button, to allow for form validation.
+    //returns an array of dom elements that are not valid - default is those elements marked as mandatory
+    // that have no data in them.
+    //You can modify this method, to highlight bad form elements etc...
+    //LA calls this method with b_suppress_message and relies on your code to communicate issues to the user
+    //Returning an empty array [] or NULL equals no error
+    //TO DO write code specific to your form
+
+    return this.parent_class.is_valid(b_suppress_message);
+  },
+
+  is_edited:function () {
+    //should return true if the form has been edited since it was loaded or since reset_edited was called
+    return this.parent_class.is_edited();
+  },
+
+  reset_edited:function () {
+    //typically called have a save
+    //TO DO write code specific to your form
+    return this.parent_class.reset_edited();
+  },
+ 
+  JSONToCSVConvertor:function(JSONData, location, ShowLabel) {
+	    
+    	//1. If JSONData is not an object then JSON.parse will parse the JSON string in an Object
+	    var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+	    var CSV = '';  
+
+
+	    //2. This condition will generate the Label/Header
+	    if (ShowLabel) {
+	        var row = "";   
+	        //This loop will extract the label from 1st index of on array
+	        for (var index in arrData[0]) {
+	            
+	            //convert each value to string and comma-seprated
+	            row += index + ',';
+	        }
+	        row = row.slice(0, -1);
+	        
+	        //append Label row with line break
+	        CSV += row + 'r\n';
+	    }
+    
+
+	    
+	    //3. 1st loop is to extract each row
+	    for (var i = 0; i < arrData.length-3; i++) {
+	        var row = "";
+	        
+
+	        //2nd loop will extract each column and convert it in string comma-seprated
+	        for (var index in arrData[i]) {
+	            row += '"' + arrData[i][index] + '",';
+	        }
+
+	        row.slice(0, row.length - 1);
+	        
+	        //add a line break after each row
+	        CSV += row + '\r\n';
+	    }
+    
+    	CSV += '\r\n'+"Cell Data"+",";
+    
+    	//4.Extracting Cell_Data and adding that as a last row		
+	       
+
+    var x= arrData[arrData.length-1];
+    	var y= Object.keys(x)[1];
+    	var cellData_value= x[y];  
+
+  
+		CSV += my_widget_script.ExtractCellData(cellData_value) + '\r\n';
+	    
+ 
+
+	    // Sending an alert if data is empty
+        if (CSV == '') {        
+	        alert("Invalid data");
+	        return;
+	    }   
+	    
+	    //Generate a file name
+	    
+	    //this will remove the blank-spaces from the title and replace it with an underscore
+	    
+    	fileName = "FreezerBox"+ location;   
+	    //Initialize file format you want csv or xls
+	    var uri = 'data:text/csv;charset=utf-8,' + escape(CSV);
+	    
+	    // Instead of using window.open(uri) which will not work in some browsers or will not get the correct file extension    
+	    
+	    //this will generate a temp <a ></a> tag
+	    var link = document.createElement("a");    
+	    link.href = uri;
+	    
+	    //set the visibility hidden so it will not effect on the web-layout
+	    link.style = "visibility:hidden";
+	    link.download = fileName + ".csv";
+	    
+	    //Append the anchor tag and remove it after automatic click
+	    document.body.appendChild(link);
+	    link.click();
+	    document.body.removeChild(link);
+	},
+  
+  ExtractCellData:function (JSONobject2) {
+       
+      var CSV_cellData= '';
+    
+    if (JSONobject2 === null || JSONobject2 === undefined){
+    	  
+     window.alert("No data available");
+        		}
+    else {
+  
+ 		// This will extract the Header of the form
+      	  var cell1= JSONobject2[Object.keys(JSONobject2)[1]];
+    	  var cellHeader= "";
+
+      
+      if ( cell1 && cell1.length){
+      for(var n=0; n< cell1.length; n++){
+
+              
+            var X= cell1[n];
+            cellHeader= '"'+ (X)[Object.keys(X)[0]]+ '",';
+          	cellHeader.slice(0, cellHeader.length - 1);
+        	CSV_cellData += cellHeader; }}
+            
+      
+      // Now we need to fetch elements of the map cellData_value={A1:[JsonObject1], B1:[JsonObject2],..}    
+      //This loop to extract JSON objects embeded as values of the hashmap   	    
+    for (var i=0; i< Object.keys(JSONobject2).length; i++) {
+      
+	    	
+          // This will extract the cell label (A1, B1, ...)
+      	  var cellLabel = Object.keys(JSONobject2)[i];   
+      	  CSV_cellData += '\r\n'+cellLabel+ ",";; 
+          //This will extract the values of each form/cell
+      	  var form= JSONobject2[cellLabel]
+          var row2= "";
+      	  for(var n=0; n< form.length; n++){
+            
+
+            var X= form[n];
+                
+              	row2= '"'+ (X)[Object.keys(X)[1]]+ '",';
+          		row2.slice(0, row2.length - 1);
+                CSV_cellData += row2; 
+
+        		}
+	    	
+	    }
+ 
+
+   return CSV_cellData;
+} 
+  return null;  
+
+  },
+  
+  ExtractLocation:function (JSONdata3) {
+
+  var arrData = typeof JSONdata3 != 'object' ? JSON.parse(JSONdata3) : JSONdata3;
+  	
+    //the position of location is 5
+  	var x= arrData[5];
+    var location
+   
+    if (x != null & x != undefined){	
+    var y= Object.keys(x)[1];
+      var location= JSON.stringify(x[y]);} 
+  
+  return location;
+}
+  
+}
+
