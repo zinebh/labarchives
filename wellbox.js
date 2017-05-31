@@ -1,4 +1,5 @@
-init_fbgrid= function (set) {
+var wellbox_methods= {
+init_fbgrid: function (set) {
       return this.each(function (i) {
         var $this = $(this);
         
@@ -133,17 +134,18 @@ init_fbgrid= function (set) {
       });
     },
     
-    _get_settings= function () {
+    _get_settings: function () {
         var $this = $(this).first();
         var set = $.parseJSON($('[name="freezerbox_settings"]', $this).val());
         set.cell_data = $.parseJSON(set.cell_data);
         return set;
       },
       
-    _resize= function() {
+    _resize: function() {
         return this.each(function (i) {
           var $this = $(this);
           $('.ui-freezerbox', $this).width(Math.min($(window).width(), Math.max($('.ui-freezerbox-info table', $this).outerWidth(true), $('.ui-freezerbox-grid table', $this).outerWidth(true))));
           $this.trigger('resize.freezerbox');
         });
       }
+}
