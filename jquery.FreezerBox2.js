@@ -251,6 +251,7 @@ Author: Eileen Campbell
         {"text":"Description","name":"freezerbox_info_desc","set_key":"desc","value":"","edit_html":'<textarea rows="3" cols=50" placeholder="Enter a description for this freezer box"/>',"view_html":'<span/>'},
         {"text":"","name":"freezerbox_info_swapLabels", "set_ket":"swap", "value":"Swap column and row labels", "edit_html":'<input type="button" class="button ui-button ui-widget ui-state-default ui-corner-all" size=30 />', "view_html":''}
       ];
+      console.log("fbinfo_fields loaded");
       var fbinfo_sizes = [
         '4x4',
         '8x8',
