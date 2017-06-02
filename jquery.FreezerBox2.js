@@ -362,6 +362,7 @@ Author: Eileen Campbell
           $this.freezerbox('init_fbgrid');
         }
       });
+       console.log(fbinfo_flds);
     },
     
     // set  settings, if not passed in, will get the size and color from the select boxes and
