@@ -361,8 +361,9 @@ Author: Eileen Campbell
         if (size === 'Custom...') {
           $this.freezerbox('init_fbgrid');
         }
+        console.log("fbinfo_flds 1");
       });
-       console.log(fbinfo_flds);
+       console.log("fbinfo_flds 2");
     },
     
     // set  settings, if not passed in, will get the size and color from the select boxes and
