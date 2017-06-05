@@ -959,5 +959,5 @@ Author: Eileen Campbell
       $.error('Method ' + method + ' does not exist on jQuery.freezerbox');
     }
   };
-
+isready= true;
 })(jQuery);
