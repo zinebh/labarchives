@@ -22,13 +22,8 @@
 <div><a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" href="#" id="addwellbox"><span class="ui-button-text">Create well box</span></a></div>
 </div>
 
-<div class="web_dialog_overlay" id="overlay">&nbsp;</div>
-
-<div class="web_dialog" id="dialog">
-<form id="myText" method="post">
-<p><label class="web_dialog_title">Text</label><textarea cols="35" id="textBox" rows="2"></textarea></p>
-
-<p><input id="saveText" style="text-align: center;" type="button" value="Save" /> or <a class="cancel" href="/" id="cancel">Cancel</a></p>
-</form>
+<div id="dialog" title="Enter text in the well" style="display: none;">
+  <textarea cols="35" id="textBox" rows="2" maxlength="150"></textarea>
 </div>
+	
 </div>
