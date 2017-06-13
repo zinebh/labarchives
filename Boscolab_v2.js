@@ -182,7 +182,13 @@ my_widget_script =
             
             tr.css({"height": "100px", "width": "50px"});
             
-            var addText_div= '<div id="addText"><a href="#" ><span class="ui-button-text"><font size="1.75">Add Text</font></span></a> </div>';
+            //'<div id="addText"><a href="#" ><span class="ui-button-text"><font size="1.75">Add Text</font></span></a> </div>'
+            //'<a href="#" class="ui-icon ui-icon-pencil" title="Edit cell"></a><a href="#" class="ui-icon ui-icon-clipboard" title="Paste copied cell"></a>';
+            var addText_div= document.createElement('a');
+            addText_div.setAttribute('href', "#");
+            addText_div.setAttribute('id','addText');
+            addText_div.className="ui-icon ui-icon-pencil"
+            
             var addSlip_div='<div><a href="#" id="addCircle"><span class="ui-button-text"><font size="1.75">Add Cover Slip</font></span></a></div>';
 			
             //'<circle cx="50%" cy="50%" r="50%" stroke="black" stroke-width="2" fill="transparent" ></circle>';
@@ -197,12 +203,12 @@ my_widget_script =
             var foreignObject= document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
             $(foreignObject).attr({id: 'fo'+r+'_c'+c}).attr("x", 20).attr("y", 20).attr("width", 100).attr("height", 100)
             foreignObject.append(addText_div);
-            foreignObject.append(addSlip_div);
+            //foreignObject.append(addSlip_div);
             
             var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
             $(svg).attr({id: "mysvg"}).attr("width", 100).attr("height", 100)
             svg.appendChild(circle_div);
-            //svg.append(foreignObject);
+            svg.appendChild(foreignObject);
                 
             td= $('<td></td>').attr({ id: 'cell_r'+r+'_c'+c}).append(svg);         
             tr.append(td);
