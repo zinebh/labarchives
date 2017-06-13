@@ -175,20 +175,38 @@ my_widget_script =
          th.css({"background-color": "GhostWhite", "height": "100px", "width": "50px"});
           
           tr = $('<tr></tr>').append(th); // APNEDING ROWS!!!
+         
           
           // Add data cells
           for (var c = 0; c < col; c++) {
+            
             tr.css({"height": "100px", "width": "50px"});
             
-            var svg= '<svg id="mysvg" width="100" height="100">'+
-            '<circle cx="50%" cy="50%" r="50%" stroke="black" stroke-width="2" fill="transparent" ></circle>'+
-            '<foreignObject x="20" y="20" width="100" height="100">'+ 
-                '<div id="addText"><a href="#" ><span class="ui-button-text"><font size="1.75">Add Text</font></span></a> </div> '+
-                '<div><a href="#" id="addCircle"><span class="ui-button-text"><font size="1.75">Add Cover Slip</font></span></a></div></foreignObject>'+
-             '</svg>'
+            var addText_div= '<div id="addText"><a href="#" ><span class="ui-button-text"><font size="1.75">Add Text</font></span></a> </div>';
+            var addSlip_div='<div><a href="#" id="addCircle"><span class="ui-button-text"><font size="1.75">Add Cover Slip</font></span></a></div>';
+			
+            //'<circle cx="50%" cy="50%" r="50%" stroke="black" stroke-width="2" fill="transparent" ></circle>';
+            var circle_div = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+            $(circle_div).attr("cx", "50%")
+              			 .attr("cy", "50%")
+              			 .attr("r", 50)
+              			 .css("fill","transparent")
+              			 .css("stroke","black")
+              			 .css("stroke-width","2");              
+            
+            var foreignObject= document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+            $(foreignObject).attr({id: 'fo'+r+'_c'+c}).attr("x", 20).attr("y", 20).attr("width", 100).attr("height", 100)
+            foreignObject.append(addText_div);
+            foreignObject.append(addSlip_div);
+            
+            var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            $(svg).attr({id: "mysvg"}).attr("width", 100).attr("height", 100)
+            svg.appendChild(circle_div);
+            //svg.append(foreignObject);
                 
-                tr.append($('<td>'+svg+'</td>'));
-   
+            td= $('<td></td>').attr({ id: 'cell_r'+r+'_c'+c}).append(svg);         
+            tr.append(td);
+
           }
           
           table.append(tr);     
@@ -202,40 +220,44 @@ my_widget_script =
     $('.ui-freezerbox-grid', this).append(table);
       
     
-   //run the code to add text or draw circle inside the well amd then make the buttons disappear
-   
-   /* $(".addText").click( function(e){
-      my_widget_script.ShowDialog(false);
-      e.preventDefault();  
-        }); */
-    
-     $("#addText").click( function(){
+   //run the code to add text or draw circle inside the well amd then make the buttons disappear   
+    $("#addText").click( function(){
       
-      $( "#dialog" ).dialog({
+      $('td').click(function(){
+  var col = $(this).parent().children().index($(this));
+  var row = $(this).parent().parent().children().index($(this).parent());
+  alert('Row: ' + row + ', Column: ' + col);
+        
+        
+    $( "#dialog" ).dialog({
        resizable: false,
       height: "auto",
       width: 400,
       modal: true,
       buttons: {
         "Save": function() {
-          my_widget_script.saveText();
+          my_widget_script.saveText('#fo'+row+'_c'+col);
         },
         Cancel: function() {
           $(this).dialog( "close" );
         }
       }
+      });    
+	  });
       });
-    
-      });
-    
+  
+  
   },
  
   
-  saveText: function()
+  saveText: function(thecell)
   {
     //save the text and commit to the well
     var txt = $("#textBox").val();
     alert("you submitted this text: "+ txt);
+    
+    $(thecell).append('<div><p>'+txt+'</p></div>');
+    
     $("#dialog").dialog( "close" );
   },
 
@@ -248,14 +270,14 @@ my_widget_script =
    $(this).remove();
   },
   
-    _get_wb_id: function () {
+  _get_wb_id: function () {
       var cnt = 1;
       while ($('#wellbox_'+cnt).length > 0)
         cnt++;
       return 'wellbox_' + cnt;  
     },
   
-_resize: function() {
+ _resize: function() {
       return this.each(function (i) {
         var $this = $(this);
         $('.ui-freezerbox', $this).width(Math.min($(window).width(), Math.max($('.ui-freezerbox-info table', $this).outerWidth(true), $('.ui-freezerbox-grid table', $this).outerWidth(true))));
