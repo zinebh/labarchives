@@ -17,6 +17,7 @@ my_widget_script =
     
     
     $("#addwellbox").click(my_widget_script.createWellbox);
+    
         
     $("#addCircle").click(my_widget_script.addCircle)
       
@@ -25,83 +26,13 @@ my_widget_script =
       "background-color": "red"
       }); 
     
-    $("#wellboxTable").css({
+ /*   $("#wellboxTable").css({
   width: "80%",
   margin: "0 auto",
   
-});
+}); */
       
-  $(".web_dialog_overlay").css(
-{
- "position": "fixed",
- "top": "0",
- "right": "0",
- "bottom": "0",
- "left": "0",
- "height": "100%",
- "width": "100%",
- "margin": "0",
- "padding": "0",
- "background": "#000000",
- "opacity": ".15",
- "filter": "alpha(opacity=15)",
- "-moz-opacity": ".15",
- "z-index": "101",
- "display": "none",
-});
-
-  $(".web_dialog").css(
-{
-"display": "none",
- "position": "fixed",
- "width": "380px",
- "height": "200px",
- "top": "50%",
- "left": "50%",
- "margin-left": "-190px",
- "margin-top": "-100px",
- "background-color": "#ffffff",
- "border": "2px solid #336699",
- "padding": "0px",
- "z-index": "102",
- "font-family": "Verdana",
- "font-size": "12pt",
-});
-
-  $(".web_dialog_title").css(
-{
- "border-bottom": "solid 2px #336699",
- "background-color": "#33669",
- "padding": "4px",
- "color": "White",
- "font-weight":"bold",
-});
-
-  $(".web_dialog_title a").css(
-{
- "color": "White",
- "text-decoration": "none",
-});
-
-  $(".align_right").css(
-{
- "text-align": "right",
-});
     
-    $('label').css({
-    "display": "block",
-  "margin-bottom": "3px",
-  "padding-left": "15px",
-  "text-indent": "-15px",
-    });
-    
-	$('#textBox').css({
-      "border-bottom": "1px solid #EFEFEF",
-  	  "margin": "8px 0",
-  	  "padding-bottom": "8px",
-});
-    
-     
    /*  if (mode == "view") {
             
        $("#addwellbox").hide();
@@ -252,8 +183,8 @@ my_widget_script =
             var svg= '<svg id="mysvg" width="100" height="100">'+
             '<circle cx="50%" cy="50%" r="50%" stroke="black" stroke-width="2" fill="transparent" ></circle>'+
             '<foreignObject x="20" y="20" width="100" height="100">'+ 
-                '<div><a href="#" class="addText"><span class="ui-button-text"><font size="1.75">Add Text</font></span></a> </div> '+
-                '<div><a href="#" class="addCircle"><span class="ui-button-text"><font size="1.75">Add Cover Slip</font></span></a></div></foreignObject>'+
+                '<div id="addText"><a href="#" ><span class="ui-button-text"><font size="1.75">Add Text</font></span></a> </div> '+
+                '<div><a href="#" id="addCircle"><span class="ui-button-text"><font size="1.75">Add Cover Slip</font></span></a></div></foreignObject>'+
              '</svg>'
                 
                 tr.append($('<td>'+svg+'</td>'));
@@ -278,9 +209,9 @@ my_widget_script =
       e.preventDefault();  
         }); */
     
-    $(".addText").click( function(){
+     $("#addText").click( function(){
       
-      $( "#web_dialog" ).dialog({
+      $( "#dialog" ).dialog({
        resizable: false,
       height: "auto",
       width: 400,
@@ -290,59 +221,22 @@ my_widget_script =
           my_widget_script.saveText();
         },
         Cancel: function() {
-          $( this ).dialog( "close" );
+          $(this).dialog( "close" );
         }
       }
       });
     
       });
     
-    $("#saveText").click( function(e){
-      my_widget_script.saveText();
-    e.preventDefault();
-    });
-    
-    $("#cancel").click(function (e)
-      {
-          my_widget_script.HideDialog();
-         e.preventDefault();
-      });
-    
-    
-    
-   },
-  
-  ShowDialog: function (modal)
-   {
-      $("#overlay").show();
-      $("#dialog").fadeIn(300);
-
-      if (modal)
-      {
-         $("#overlay").unbind("click");
-      }
-      else
-      {
-         $("#overlay").click(function (e)
-         {
-             my_widget_script.HideDialog();
-         });
-      }
-   },
-
-  HideDialog: function()
-   {
-      $("#overlay").hide();
-      $("#dialog").fadeOut(300);
-   } ,
+  },
+ 
   
   saveText: function()
   {
     //save the text and commit to the well
     var txt = $("#textBox").val();
     alert("you submitted this text: "+ txt);
-    my_widget_script.HideDialog();
-        // e.preventDefault();
+    $("#dialog").dialog( "close" );
   },
 
   
