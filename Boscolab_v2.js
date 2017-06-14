@@ -244,15 +244,14 @@ my_widget_script =
         cell.find("#addText").show();
         cell.find("#addSlip").show();
         
-        //show the dialog box on click for icon Edit
-        cell.find("#addText").click( function(event){      
-  		var c = cell.parent().children().index(cell);
-  		var r = cell.parent().parent().children().index(cell.parent());
-  		alert('Row: ' + r + ', Column: ' + c);
-          
-          
-             
-    $( "#dialog" ).dialog({
+        
+      //show the dialog box on click for icon Edit
+      cell.find("#addText").click( function(event){
+      var c = cell.parent().children().index(cell);
+  	  var r = cell.parent().parent().children().index(cell.parent());
+  		alert('Row: ' + r + ', Column: ' + c);  
+        
+      $( "#dialog" ).dialog({
        resizable: false,
       height: "auto",
       width: 400,
@@ -260,11 +259,11 @@ my_widget_script =
       buttons: {
         "Save": function() {
           
-          if( ! $(this).find('#myTxtBox') ){
-            my_widget_script.saveText('#fo'+r+'_c'+c);
+          if( (cell.find("#myTxt")).length>0){
+            my_widget_script.modifyText('#fo'+r+'_c'+c);
           } else {
           
-          my_widget_script.modifyText('#fo'+r+'_c'+c);
+          my_widget_script.saveText('#fo'+r+'_c'+c);
           }
         },
         "delete": function(){
@@ -277,6 +276,15 @@ my_widget_script =
     });
              	 
    });
+        
+     //show the dialog box on click for icon Edit
+        cell.find("#addSlip").click( function(event){ 
+        var c = cell.parent().children().index(cell);
+  	  	var r = cell.parent().parent().children().index(cell.parent());
+  		alert('Row: ' + r + ', Column: ' + c);
+          
+          $('#fo'+r+'_c'+c).append ('<circle cx="30" cy="40" r="30" fill="red" ></circle>')
+        });   
 
           },   
       function(){$(this).find("#addText").hide();
@@ -295,24 +303,22 @@ my_widget_script =
     var txt= $("#textBox").val();
     alert("you submitted this text: "+ txt);
     
-    var myTxtBox= document.createElement('p');
-    myTxtBox.append(document.createTextNode(txt));
-    myTxtBox.setAttribute('id', 'myTxtBox');
+    var myTxt= document.createElement('p');
+    myTxt.append(document.createTextNode(txt));
+    myTxt.setAttribute('id', 'myTxt');
     
-    $(thecell).append(myTxtBox);
+    $(thecell).append(myTxt);
     
     $("#dialog").dialog( "close" );
   },
   
   modifyText: function(thecell){
-   var myTxtBox= $(thecell).find('#myTxtBox')
-   myTxtBox.nodeValue= $("#textBox").val();    
+   var myTxt= $(thecell).find('#myTxt');
+   myTxt.text($("#textBox").val());
+   $("#dialog").dialog( "close" );
   },
 
-  
-  addSlip: function(){
-  $('.ui-freezerbox', this).remove()
-  },
+ 
   
   destroy: function(){
    $(this).remove();
