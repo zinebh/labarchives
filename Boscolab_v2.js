@@ -17,20 +17,7 @@ my_widget_script =
     
     
     $("#addwellbox").click(my_widget_script.createWellbox);
-    
-        
-    $("#addCircle").click(my_widget_script.addCircle)
-      
-      $("container").css({
-      width: "25%",
-      "background-color": "red"
-      }); 
-    
- /*   $("#wellboxTable").css({
-  width: "80%",
-  margin: "0 auto",
-  
-}); */
+   
       
     
    /*  if (mode == "view") {
@@ -181,15 +168,28 @@ my_widget_script =
           for (var c = 0; c < col; c++) {
             
             tr.css({"height": "100px", "width": "50px"});
+            var td= $('<td></td>').attr({ id: 'cell_r'+r+'_c'+c});
             
             //'<div id="addText"><a href="#" ><span class="ui-button-text"><font size="1.75">Add Text</font></span></a> </div>'
             //'<a href="#" class="ui-icon ui-icon-pencil" title="Edit cell"></a><a href="#" class="ui-icon ui-icon-clipboard" title="Paste copied cell"></a>';
             var addText_div= document.createElement('a');
             addText_div.setAttribute('href', "#");
             addText_div.setAttribute('id','addText');
-            addText_div.className="ui-icon ui-icon-pencil"
+            addText_div.setAttribute('title','Edit');
+            addText_div.className="ui-icon ui-icon-pencil";
+            addText_div.setAttribute('x','10');
+            addText_div.setAttribute('y','10');
+            //addText_div.style.visibility='hidden';
             
-            var addSlip_div='<div><a href="#" id="addCircle"><span class="ui-button-text"><font size="1.75">Add Cover Slip</font></span></a></div>';
+            
+            //'<div><a href="#" id="addCircle"><span class="ui-button-text"><font size="1.75">Add Cover Slip</font></span></a></div>';
+            var addSlip_div= document.createElement('a');
+            addSlip_div.setAttribute('href', "#");
+            addSlip_div.setAttribute('id','addSlip');
+            addSlip_div.setAttribute('title','Add Cover Slip');
+            addSlip_div.className="ui-icon ui-icon-bullet";
+            addSlip_div.setAttribute('x','20');
+            addSlip_div.setAttribute('y','20');
 			
             //'<circle cx="50%" cy="50%" r="50%" stroke="black" stroke-width="2" fill="transparent" ></circle>';
             var circle_div = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
@@ -200,23 +200,24 @@ my_widget_script =
               			 .css("stroke","black")
               			 .css("stroke-width","2");              
             
-            var foreignObject= document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-            $(foreignObject).attr({id: 'fo'+r+'_c'+c}).attr("x", 20).attr("y", 20).attr("width", 100).attr("height", 100)
-            foreignObject.append(addText_div);
-            //foreignObject.append(addSlip_div);
-            
+            var foreignObject= document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
+            $(foreignObject).attr({id: 'fo'+r+'_c'+(c+1)}).attr("x", 20).attr("y", 20).attr("width", 100).attr("height", 100)
+  
             var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
             $(svg).attr({id: "mysvg"}).attr("width", 100).attr("height", 100)
             svg.appendChild(circle_div);
             svg.appendChild(foreignObject);
-                
-            td= $('<td></td>').attr({ id: 'cell_r'+r+'_c'+c}).append(svg);         
+            foreignObject.append(addText_div);
+            foreignObject.append(addSlip_div);
+            
+            td.append(svg);
             tr.append(td);
 
           }
           
           table.append(tr);     
         }
+    
    
     $("#wellboxentry").append(table);
     
@@ -227,14 +228,30 @@ my_widget_script =
       
     
    //run the code to add text or draw circle inside the well amd then make the buttons disappear   
-    $("#addText").click( function(){
+    
+    $("#wellbox tr").each(function(){
       
-      $('td').click(function(){
-  var col = $(this).parent().children().index($(this));
-  var row = $(this).parent().parent().children().index($(this).parent());
-  alert('Row: ' + row + ', Column: ' + col);
+      $('td', this).each(function () {
         
+        //the icons are set to hidden unless we hover over the cell
+        $(this).find("#addText").hide();
+        $(this).find("#addSlip").hide();
+    
+        //hover over the cell to show the icons and trigger actions on click
+     $(this).hover(
+      function(){
+       var cell=$(this)
+        cell.find("#addText").show();
+        cell.find("#addSlip").show();
         
+        //show the dialog box on click for icon Edit
+        cell.find("#addText").click( function(event){      
+  		var c = cell.parent().children().index(cell);
+  		var r = cell.parent().parent().children().index(cell.parent());
+  		alert('Row: ' + r + ', Column: ' + c);
+          
+          
+             
     $( "#dialog" ).dialog({
        resizable: false,
       height: "auto",
@@ -242,33 +259,58 @@ my_widget_script =
       modal: true,
       buttons: {
         "Save": function() {
-          my_widget_script.saveText('#fo'+row+'_c'+col);
+          
+          if( ! $(this).find('#myTxtBox') ){
+            my_widget_script.saveText('#fo'+r+'_c'+c);
+          } else {
+          
+          my_widget_script.modifyText('#fo'+r+'_c'+c);
+          }
+        },
+        "delete": function(){
+          $("#textBox").val('');
         },
         Cancel: function() {
           $(this).dialog( "close" );
         }
       }
-      });    
-	  });
-      });
-  
-  
+    });
+             	 
+   });
+
+          },   
+      function(){$(this).find("#addText").hide();
+                 $(this).find("#addSlip").hide();}
+    )
+                
+      })
+        
+        })
   },
  
   
   saveText: function(thecell)
   {
     //save the text and commit to the well
-    var txt = $("#textBox").val();
+    var txt= $("#textBox").val();
     alert("you submitted this text: "+ txt);
     
-    $(thecell).append('<div><p>'+txt+'</p></div>');
+    var myTxtBox= document.createElement('p');
+    myTxtBox.append(document.createTextNode(txt));
+    myTxtBox.setAttribute('id', 'myTxtBox');
+    
+    $(thecell).append(myTxtBox);
     
     $("#dialog").dialog( "close" );
   },
+  
+  modifyText: function(thecell){
+   var myTxtBox= $(thecell).find('#myTxtBox')
+   myTxtBox.nodeValue= $("#textBox").val();    
+  },
 
   
-  addCircle: function(){
+  addSlip: function(){
   $('.ui-freezerbox', this).remove()
   },
   
