@@ -17,7 +17,13 @@ my_widget_script =
     
     
     $("#addwellbox").click(my_widget_script.createWellbox);
-   
+     $("#myTxt").css({
+      'position': 'absolute',
+      'float': 'right',
+      'top': '0'
+    });
+    
+
       
     
    /*  if (mode == "view") {
@@ -139,7 +145,7 @@ my_widget_script =
         
         
         // Create grid
-        var table = $('<table id="wellbox" border="1" bordercolor="lightgrey" cellspacing="0"></table>');
+        var table = $('<table class="ui-freezerbox-grid" id="wellbox" border="1" bordercolor="lightgrey" cellspacing="0"></table>');
         
     // Add col header row
         var tr = $('<tr></tr>').append('<th></th>');
@@ -179,8 +185,6 @@ my_widget_script =
             addText_div.className="ui-icon ui-icon-pencil";
             addText_div.setAttribute('x','10');
             addText_div.setAttribute('y','10');
-            //addText_div.style.visibility='hidden';
-            
             
             //'<div><a href="#" id="addCircle"><span class="ui-button-text"><font size="1.75">Add Cover Slip</font></span></a></div>';
             var addSlip_div= document.createElement('a');
@@ -201,10 +205,10 @@ my_widget_script =
               			 .css("stroke-width","2");              
             
             var foreignObject= document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
-            $(foreignObject).attr({id: 'fo'+r+'_c'+(c+1)}).attr("x", 20).attr("y", 20).attr("width", 100).attr("height", 100)
+            $(foreignObject).attr({id: 'fo_r'+r+'_c'+(c+1)}).attr("x", 20).attr("y", 20).attr("width", 100).attr("height", 100)
   
             var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            $(svg).attr({id: "mysvg"}).attr("width", 100).attr("height", 100)
+            $(svg).attr({id: 'mysvg_r'+r+'_c'+(c+1)}).attr("width", 100).attr("height", 100)
             svg.appendChild(circle_div);
             svg.appendChild(foreignObject);
             foreignObject.append(addText_div);
@@ -249,7 +253,6 @@ my_widget_script =
       cell.find("#addText").click( function(event){
       var c = cell.parent().children().index(cell);
   	  var r = cell.parent().parent().children().index(cell.parent());
-  		alert('Row: ' + r + ', Column: ' + c);  
         
       $( "#dialog" ).dialog({
        resizable: false,
@@ -260,10 +263,9 @@ my_widget_script =
         "Save": function() {
           
           if( (cell.find("#myTxt")).length>0){
-            my_widget_script.modifyText('#fo'+r+'_c'+c);
-          } else {
-          
-          my_widget_script.saveText('#fo'+r+'_c'+c);
+            my_widget_script.modifyText('#fo_r'+r+'_c'+c);
+          } else {  
+          	my_widget_script.saveText('#fo_r'+r+'_c'+c);
           }
         },
         "delete": function(){
@@ -281,9 +283,18 @@ my_widget_script =
         cell.find("#addSlip").click( function(event){ 
         var c = cell.parent().children().index(cell);
   	  	var r = cell.parent().parent().children().index(cell.parent());
-  		alert('Row: ' + r + ', Column: ' + c);
           
-          $('#fo'+r+'_c'+c).append ('<circle cx="30" cy="40" r="30" fill="red" ></circle>')
+     var slip = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+            
+     $(slip).attr("cx", "75%")
+            .attr("cy", "75%")
+            .attr("r", 8)
+            .css("fill","orange");
+          $('#mysvg_r'+r+'_c'+c).append (slip);
+          var c= document.createElement('canvas');
+          c.width= 10;
+          c.height= 10;
+          
         });   
 
           },   
@@ -300,13 +311,17 @@ my_widget_script =
   saveText: function(thecell)
   {
     //save the text and commit to the well
+    
     var txt= $("#textBox").val();
     alert("you submitted this text: "+ txt);
     
     var myTxt= document.createElement('p');
     myTxt.append(document.createTextNode(txt));
     myTxt.setAttribute('id', 'myTxt');
+    myTxt.style.fontSize='xx-small';
+    myTxt.style.wordWrap = "break-word";
     
+   
     $(thecell).append(myTxt);
     
     $("#dialog").dialog( "close" );
