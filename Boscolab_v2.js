@@ -17,14 +17,7 @@ my_widget_script =
     
     
     $("#addwellbox").click(my_widget_script.createWellbox);
-     $("#myTxt").css({
-      'position': 'absolute',
-      'float': 'right',
-      'top': '0'
-    });
-    
-
-      
+        
     
    /*  if (mode == "view") {
             
@@ -152,10 +145,20 @@ my_widget_script =
 
         for (var c = 0; c < col; c++) {
           var th = $('<th class="ui-freezerbox-grid-colheader"></th>').html("<div class='ui-freezerbox-colheader-inner'>"+"</div>");
+           	  th.css({"background-color": "GhostWhite", "height": "50px", "width": "100px"});
+              tr.append(th); // APPENDING COLUMNS!
           
-          th.css({"background-color": "GhostWhite", "height": "50px", "width": "100px"});
+            //Adding the text edit icon
+            var addText_div= document.createElement('a');
+            addText_div.setAttribute('href', "#");
+            addText_div.setAttribute('id','addText');
+            addText_div.setAttribute('title','Edit');
+            addText_div.className="ui-icon ui-icon-pencil";
+            addText_div.setAttribute('x','10');
+            addText_div.setAttribute('y','10');
+            th.append(addText_div);
+            
           
-          tr.append(th); // APPENDING COLUMNS!
           // edit on click
         }
         table.append(tr);
@@ -164,20 +167,28 @@ my_widget_script =
         for (var r = 1; r <= row; r++) {
           
           // Add row header cell
-          var th = $('<th class="ui-freezerbox-grid-rowheader"></th>').html("<div class='ui-freezerbox-rowheader-inner'>"+"</div>");
-         th.css({"background-color": "GhostWhite", "height": "100px", "width": "50px"});
+          	var th = $('<th class="ui-freezerbox-grid-rowheader"></th>').html("<div class='ui-freezerbox-rowheader-inner'>"+"</div>");
+         	    th.css({"background-color": "GhostWhite", "height": "100px", "width": "100px"});
           
-          tr = $('<tr></tr>').append(th); // APNEDING ROWS!!!
-         
+          	tr = $('<tr></tr>').append(th); // APNEDING ROWS!!!
+            //Adding the text edit icon
+            var addText_div= document.createElement('a');
+            addText_div.setAttribute('href', "#");
+            addText_div.setAttribute('id','addText');
+            addText_div.setAttribute('title','Edit');
+            addText_div.className="ui-icon ui-icon-pencil";
+            addText_div.setAttribute('x','10');
+            addText_div.setAttribute('y','10');
+            th.append(addText_div);
           
+
           // Add data cells
           for (var c = 0; c < col; c++) {
             
-            tr.css({"height": "100px", "width": "50px"});
+            tr.css({"height": "100px", "width": "100px"});
             var td= $('<td></td>').attr({ id: 'cell_r'+r+'_c'+c});
             
-            //'<div id="addText"><a href="#" ><span class="ui-button-text"><font size="1.75">Add Text</font></span></a> </div>'
-            //'<a href="#" class="ui-icon ui-icon-pencil" title="Edit cell"></a><a href="#" class="ui-icon ui-icon-clipboard" title="Paste copied cell"></a>';
+             //Adding the text edit icon
             var addText_div= document.createElement('a');
             addText_div.setAttribute('href', "#");
             addText_div.setAttribute('id','addText');
@@ -186,7 +197,7 @@ my_widget_script =
             addText_div.setAttribute('x','10');
             addText_div.setAttribute('y','10');
             
-            //'<div><a href="#" id="addCircle"><span class="ui-button-text"><font size="1.75">Add Cover Slip</font></span></a></div>';
+            //Adding the slip icon
             var addSlip_div= document.createElement('a');
             addSlip_div.setAttribute('href', "#");
             addSlip_div.setAttribute('id','addSlip');
@@ -205,7 +216,11 @@ my_widget_script =
               			 .css("stroke-width","2");              
             
             var foreignObject= document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
-            $(foreignObject).attr({id: 'fo_r'+r+'_c'+(c+1)}).attr("x", 20).attr("y", 20).attr("width", 100).attr("height", 100)
+            $(foreignObject).attr({id: 'fo_r'+r+'_c'+(c+1)})
+              				.attr("x", 12).attr("y", 17)
+              				.attr("width", 75)
+              				.attr("height", 65)
+              				.attr("overflow", 'hidden');
   
             var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
             $(svg).attr({id: 'mysvg_r'+r+'_c'+(c+1)}).attr("width", 100).attr("height", 100)
@@ -230,9 +245,60 @@ my_widget_script =
     var fb_id = $('.ui-freezerbox', this).attr('id');
     $('.ui-freezerbox-grid', this).append(table);
       
+    //Code for the edit icon for the row and column headers:
+      $("#wellbox tr").each(function(){
+      
+      $('th', this).each(function () {
+        
+        //the icons are set to hidden unless we hover over the cell
+        $(this).find("#addText").hide();
     
-   //run the code to add text or draw circle inside the well amd then make the buttons disappear   
+        //hover over the cell to show the icons and trigger actions on click
+     $(this).hover(
+      function(){
+       var cell=$(this)
+        cell.find("#addText").show();
+        
+        
+      //show the dialog box on click for icon Edit
+      cell.find("#addText").click( function(event){
+      var c = cell.parent().children().index(cell);
+  	  var r = cell.parent().parent().children().index(cell.parent());
+        
+      $( "#dialog" ).dialog({
+       resizable: false,
+      height: "auto",
+      width: 400,
+      modal: true,
+      buttons: {
+        "Save": function() {
+          
+          if( (cell.find("#myTxt")).length>0){
+            my_widget_script.modifyText(cell);
+          } else {  
+          	my_widget_script.saveText(cell);
+          }
+        },
+        "delete": function(){
+          $("#textBox").val('');
+        },
+        Cancel: function() {
+          $(this).dialog( "close" );
+        }
+      }
+    });
+             	 
+   });
+          },   
+      function(){$(this).find("#addText").hide()}
+    )
+                 
+       })
+ 
+        });
     
+    
+   //run the code to add text or draw circle inside the well and then make the buttons disappear       
     $("#wellbox tr").each(function(){
       
       $('td', this).each(function () {
@@ -276,10 +342,11 @@ my_widget_script =
         }
       }
     });
+          
              	 
    });
         
-     //show the dialog box on click for icon Edit
+     //Draw a slip cover(circle) on click for icon circle
         cell.find("#addSlip").click( function(event){ 
         var c = cell.parent().children().index(cell);
   	  	var r = cell.parent().parent().children().index(cell.parent());
@@ -301,10 +368,11 @@ my_widget_script =
       function(){$(this).find("#addText").hide();
                  $(this).find("#addSlip").hide();}
     )
-                
-      })
-        
-        })
+                 
+       })
+ 
+        });
+ 
   },
  
   
@@ -320,10 +388,15 @@ my_widget_script =
     myTxt.setAttribute('id', 'myTxt');
     myTxt.style.fontSize='xx-small';
     myTxt.style.wordWrap = "break-word";
+    myTxt.style.width= '75px';
+    myTxt.style.height= '65px';
+    myTxt.style.overflow='hidden';
+
     
-   
     $(thecell).append(myTxt);
     
+    $('#myTxt').css({ 'line-height':'normal', 'margin':'0px 0px 0px 10px','overflow':'hidden','white-space':'nowrap', 
+                     'text-overflow': 'ellipsis', 'position':'absolute' });
     $("#dialog").dialog( "close" );
   },
   
