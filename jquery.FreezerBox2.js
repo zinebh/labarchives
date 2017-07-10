@@ -38,7 +38,7 @@ Author: Eileen Campbell
         .freezerbox('init_cellform', settings)
         .freezerbox('init_tooltip');
       
-      this.each(function (i) {
+   /*   this.each(function (i) {
         var fb_id = $(this).freezerbox('_get_fb_id');
         // Create the main divs and hidden fields of the freezer box
         $('<div id="'+fb_id+'" class="ui-freezerbox ui-freezerbox-content ui-widget-content ui-corner-all" style="overflow: auto"/>')
@@ -49,7 +49,7 @@ Author: Eileen Campbell
           .append('<input name="freezerbox_cellisvalid" type="hidden" value=""/>')
           .append('<input name="freezerbox_copiedcell" type="hidden" value=""/>')
           .appendTo(this);
-      });
+      }); 
         
       // Init the hidden fields of the freezer box
       // Save the cell form as the default for new cells
@@ -73,7 +73,7 @@ Author: Eileen Campbell
       $(window).bind('resize', function () {
         $this.freezerbox('_resize');
       });
-      
+      */
       return this;
     },
     
