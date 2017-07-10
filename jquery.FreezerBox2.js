@@ -9,6 +9,7 @@ Author: Eileen Campbell
     // Public methods
 
     init: function (options) {
+      console.log( "Freezerbox 2 is loaded");
       // If this element is already a freezerbox widget, destroy it and re-init it
       $('.ui-freezerbox', this).freezerbox('destroy');
       
