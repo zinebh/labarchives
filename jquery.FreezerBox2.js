@@ -2,7 +2,7 @@
 Author: Eileen Campbell
 */
 (function($) {
-  
+  console.log("Script 2 starts here ");
   var freezerbox_methods = {
     
     //////////////////////////////////////////////////
