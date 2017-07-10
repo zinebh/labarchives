@@ -953,6 +953,7 @@ Author: Eileen Campbell
   $.fn.freezerbox = function(method) {
     console.log("Freezerbox2 plugin is here");
     // Method calling logic
+    return freezerbox_methods.init.apply(this, arguments);
     if (freezerbox_methods[method]) {
       return freezerbox_methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
     } else if ( typeof method === 'object' || !method) {
