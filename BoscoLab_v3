@@ -93,7 +93,7 @@ my_widget_script =
     var sizeTxt1=( function () {  
       return $(this).val();
         }).bind($('select[name="size"]'))();
-    var size= my_widget_script.getSize(sizeTxt1); 
+     size= my_widget_script.getSize(sizeTxt1); 
     
     var row= size[0];
     var col= size[1];
@@ -128,9 +128,8 @@ my_widget_script =
             addText_div.setAttribute('x','10');
             addText_div.setAttribute('y','10');
             th.append(addText_div);
-            
-          
-          // edit on click
+  
+            //Edit on click
         }
         table.append(tr);
         
@@ -154,13 +153,11 @@ my_widget_script =
           
 
           // Add data cells
-          for (var c = 0; c < col; c++) {
-            
+          for (var c = 0; c < col; c++) {            
             tr.css({"height": "100px", "width": "100px"});
             var td= $('<td></td>').attr({ id: 'cell_r'+r+'_c'+c});
             my_widget_script.setTableCell(td, r, c)
             tr.append(td);
-
           }
           
           table.append(tr);     
@@ -221,72 +218,55 @@ my_widget_script =
     var dr= newSize[0]-oldSize[0];
     var dc= newSize[1]-oldSize[1];
 
-    // Add new rows
-    	
-        for (var r=oldSize[0]; r < newSize[0]; r++) {
-         var tr= $('<tr></tr>').css({"height": "100px", "width": "100px"});
-          // Add row header cell
-          	var th = $('<th class="ui-freezerbox-grid-rowheader"></th>').html("<div class='ui-freezerbox-rowheader-inner'>"+"</div>");
-         	    th.css({"background-color": "GhostWhite", "height": "100px", "width": "50px", "max-width": "70px"});
-           
-          //Adding the text edit icon
-            var addText_div= document.createElement('a');
-            addText_div.setAttribute('href', "#");
-            addText_div.setAttribute('id','addText');
-            addText_div.setAttribute('title','Edit');
-            addText_div.className="ui-icon ui-icon-pencil";
-            addText_div.setAttribute('x','10');
-            addText_div.setAttribute('y','10');
-            th.append(addText_div);         
-          	tr.append(th);
-         	$("#wellbox").find('tr').eq(r).after(tr);
-
-    // Append data cells to the rows
-          for (var c = 1; c <= oldSize[1]; c++) {
-            var td= $('<td></td>').attr({ id: 'cell_r'+r+'_c'+c});
-             my_widget_script.setTableCell(td, r, c);
-            tr.append(td);
-          }
-          
-         // $('#wellbox').append(tr); 
+    
+    if (dr>0 && dc>0){    
+      // Add new rows        
+       my_widget_script.addRows(oldSize, newSize);
+        
+   	  //Add new columns
+      my_widget_script.addCols(oldSize, newSize);
+      
+      } else if(dr<0 && dc<0 ){
+ 
+        //Remove Rows
+         for (var r= oldSize[0]; r>newSize[0]; r--){
+          $("#wellbox").find('tr').eq(r).remove();
         }
         
-   //Add new columns
-   
-    for (r=0; r<=newSize[0]; r++){
-      tr= $("#wellbox").find('tr').eq(r);
-      
-      for (var c = (oldSize[1]+1); c <= newSize[1]; c++) {
-      if (r==0){  
-        // Add col header row       
-          var th = $('<th class="ui-freezerbox-grid-colheader"></th>').html("<div class='ui-freezerbox-colheader-inner'>"+"</div>");
-           	  th.css({"background-color": "GhostWhite", "height":"50px", "max-height": "70px", "max-width": "100px"});
-              tr.append(th);
-        	  //Adding the text edit icon
-            var addText_div= document.createElement('a');
-            addText_div.setAttribute('href', "#");
-            addText_div.setAttribute('id','addText');
-            addText_div.setAttribute('title','Edit');
-            addText_div.className="ui-icon ui-icon-pencil";
-            addText_div.setAttribute('x','10');
-            addText_div.setAttribute('y','10');
-            th.append(addText_div);
+        //Remove columns       
+        for (var c= oldSize[1]; c>newSize[1]; c--){  
+          $('#wellbox tr td:nth-child('+c+'), tr th:nth-child('+c+')').remove();         
+        }
         
+        
+      } else if (dr>0 && dc<0){
+        
+        //Remove columns       
+        for (var c= oldSize[1]; c>newSize[1]; c--){ 
+          $('#wellbox tr td:nth-child('+c+'), tr th:nth-child('+c+')').remove();         
+        }
+        //Add Rows
+         my_widget_script.addRows(oldSize, newSize);
+         
+        
+      } else if (dr<0 && dc>0){
+        //Remove Rows
+        for (var r= oldSize[0]; r>newSize[0]; r--){
+          $("#wellbox").find('tr').eq(r).remove();
+        }
+        
+        //Add Columns
+        my_widget_script.addCols(oldSize, newSize); 
       }
-      else {
-      		var td= $('<td></td>').attr({ id: 'cell_r'+r+'_c'+c}).css({"height": "100px", "width": "100px"});
-        	my_widget_script.setTableCell(td, r, c);
-            tr.append(td);          
-      }
-    }
-    };
+
+    
     my_widget_script.parent_class.resize_container();
     
     //Edit the headers
     my_widget_script.editHeaders();
     
    //Edit the cells(wells)       
-   my_widget_script.editCells();
+    my_widget_script.editCells();
   
   },
   
@@ -303,24 +283,38 @@ my_widget_script =
         }
         else if (sizeTxt === 'Custom...') {
           
-          //row = parseInt($('[name="freezerbox_info_custom_row_number"]', this).val());
-         // col = parseInt($('[name="freezerbox_info_custom_col_number"]', this).val());
-        
-     $("#Custom_rows").show();      
-  /*   $('[name="in_rows"]').spinner({
+           $("#custom_rows").show();
+     	   $("#custom_cols").show();  
+           $("#buildCustom").show();
+          
+          var oldRow = $('#wellbox >tbody >tr').length - 1;  
+          var oldCol= $('#wellbox tr:eq(1) td').length ;
+          var oldSize= [oldRow,oldCol];
+          
+           $('[name="in_rows"], [name="in_cols"]').spinner({
                 min: 1,
-                max: 25,
+                max: 15,
                 stop: function(evt, ui) {
                   var n = parseInt($(this).val());
-                  if (!isNaN(n) && (n > 0) && (n <= 25)) {
-                    //my_widget_script.changeTableSize(oldSize, newSize);
-                    alert("value of n is: "+n);
+                  if (!isNaN(n) && (n > 0) && (n <= 15)) {
+  
+                    row = parseInt($('#in_rows', this).val());
+                    col = parseInt($('#in_cols', this).val()); 
+                    newSize= [row,col];
+                    
+                   $("#buildCustom").click(function() {my_widget_script.changeTableSize(oldSize, newSize)});
                   }
                   else {
-                    window.alert('Please enter a number between 1 and 25.');
+                    window.alert('Please enter a number between 1 and 15.');
                   }
                 }
-              }); */
+              }); 
+                   row = parseInt($('#in_rows', this).val());
+                    col = parseInt($('#in_cols', this).val()); 
+
+          
+          
+    
           
           // Make custom size input boxes spinners
          /*   $('[name="Custom_rows"],[name="Custom_cols"]')
@@ -419,6 +413,23 @@ my_widget_script =
             
             td.append(svg);
   },
+  
+  setHeader: function(){
+  // Add row header cell
+          	var th = $('<th class="ui-freezerbox-grid-rowheader"></th>').html("<div class='ui-freezerbox-rowheader-inner'>"+"</div>");
+         	    
+                     //Adding the text edit icon
+            var addText_div= document.createElement('a');
+            addText_div.setAttribute('href', "#");
+            addText_div.setAttribute('id','addText');
+            addText_div.setAttribute('title','Edit');
+            addText_div.className="ui-icon ui-icon-pencil";
+            addText_div.setAttribute('x','10');
+            addText_div.setAttribute('y','10');
+            th.append(addText_div);
+    return th;
+  },
+  
   editHeaders: function(){
         
     //Code for the edit icon for the row and column headers:
@@ -556,5 +567,45 @@ my_widget_script =
        })
  
         });
+  },
+  
+  addRows: function(oldSize, newSize){
+  // Add new rows        
+      for (var r=oldSize[0]; r < newSize[0]; r++) {
+        
+          //Add Row Header
+      	  var th=my_widget_script.setHeader();
+          th.css({"background-color": "GhostWhite", "height": "100px", "width": "50px", "max-width": "70px"});      	           
+          var tr= $('<tr></tr>').css({"height": "100px", "width": "100px"});
+          tr.append(th);
+          $("#wellbox").find('tr').eq(r).after(tr);
+
+    	  // Append data cells to the rows
+          for (var c = 1; c <= oldSize[1]; c++) {           
+            var td= $('<td></td>').attr({ id: 'cell_r'+r+'_c'+c});
+             my_widget_script.setTableCell(td, r, c);
+            tr.append(td);
+          }
+        }
+  },
+
+
+  addCols: function(oldSize, newSize){
+  for (r=0; r<=newSize[0]; r++){
+      tr= $("#wellbox").find('tr').eq(r);
+      
+      for (var c = (oldSize[1]+1); c <= newSize[1]; c++) {
+      	if (r==0){  
+          // Add col header row 
+          var th=my_widget_script.setHeader();
+           	  th.css({"background-color": "GhostWhite", "height":"50px", "max-height": "70px", "max-width": "100px"});
+              tr.append(th);   
+      	} 
+        else {
+      		var td= $('<td></td>').attr({ id: 'cell_r'+r+'_c'+c}).css({"height": "100px", "width": "100px"});
+        	my_widget_script.setTableCell(td, r, c);
+            tr.append(td);          
+        } 
+      }}
   }
 }
